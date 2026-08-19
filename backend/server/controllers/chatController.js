@@ -45,19 +45,11 @@ export const sendMessage = async (req, res, next) => {
       language: lang,
     });
 
-    const legalContent = aiResult.legal_answer || aiResult.legalContent || '';
-    const simpleContent = aiResult.simple_explanation || aiResult.simpleContent || '';
-    const nextSteps = aiResult.next_steps || aiResult.nextSteps || [];
-
-    const assistantContent = [
-      legalContent ? `⚖️ Legal Answer\n\n${legalContent}` : '',
-      simpleContent ? `📖 Simple Explanation\n\n${simpleContent}` : '',
-      nextSteps.length
-        ? `🔜 What To Do Next\n\n${nextSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
-        : '',
-    ]
-      .filter(Boolean)
-      .join('\n\n');
+    // FastAPI pre-formats the entire response (Legal, Simple, Next Steps) into 'answer'
+    const assistantContent = aiResult.answer || 'I am sorry, I could not generate a response.';
+    const legalContent = '';
+    const simpleContent = '';
+    const nextSteps = [];
 
     chat.messages.push({
       role: 'assistant',

@@ -49,13 +49,12 @@ const handleAiError = (error, operation) => {
 
 export const generateDraft = async ({ plainText, category, language, additionalDetails }) => {
   try {
+    const situation = `${plainText}. Additional details: ${additionalDetails || 'None'}. Language: ${language || 'en'}`;
     const response = await createClient().post('/api/v1/draft', {
-      plain_text: plainText,
-      category,
-      language: language || 'en',
-      additional_details: additionalDetails || '',
+      situation: situation,
+      document_type: category || 'Legal Document',
     });
-    return response.data?.data || response.data;
+    return response.data;
   } catch (error) {
     handleAiError(error, 'draft generation');
   }
@@ -64,11 +63,9 @@ export const generateDraft = async ({ plainText, category, language, additionalD
 export const queryLegal = async ({ query, language, filters = {} }) => {
   try {
     const response = await createClient().post('/api/v1/query', {
-      query,
-      language: language || 'en',
-      filters,
+      question: `${query} (Respond in language: ${language || 'en'})`,
     });
-    return response.data?.data || response.data;
+    return response.data;
   } catch (error) {
     handleAiError(error, 'legal query');
   }
@@ -76,12 +73,11 @@ export const queryLegal = async ({ query, language, filters = {} }) => {
 
 export const sendChatMessage = async ({ message, history, language }) => {
   try {
-    const response = await createClient().post('/api/v1/chat', {
-      message,
-      history: history || [],
-      language: language || 'en',
+    // The chat uses the same RAG Q&A endpoint
+    const response = await createClient().post('/api/v1/query', {
+      question: `${message} (Respond in language: ${language || 'en'})`,
     });
-    return response.data?.data || response.data;
+    return response.data;
   } catch (error) {
     handleAiError(error, 'chat');
   }

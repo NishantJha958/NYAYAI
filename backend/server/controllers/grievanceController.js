@@ -33,10 +33,10 @@ export const createGrievance = async (req, res, next) => {
         additionalDetails: grievance.additionalDetails,
       });
 
-      grievance.legalDraft = aiResult.legal_draft || aiResult.legalDraft || '';
+      grievance.legalDraft = aiResult.draft || aiResult.legal_draft || aiResult.legalDraft || '';
       grievance.simplifiedExplanation =
         aiResult.simplified_explanation || aiResult.simplifiedExplanation || '';
-      grievance.statutes = (aiResult.statutes || []).map((s) => ({
+      grievance.statutes = (aiResult.sources || aiResult.statutes || []).map((s) => ({
         act: s.act || '',
         section: s.section || '',
         title: s.title || '',

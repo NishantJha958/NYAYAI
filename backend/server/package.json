@@ -9,7 +9,11 @@
     "dev": "node --watch server.js",
     "test": "node --test tests/*.test.js"
   },
-  "keywords": ["nyaya", "legal", "api"],
+  "keywords": [
+    "nyaya",
+    "legal",
+    "api"
+  ],
   "license": "MIT",
   "dependencies": {
     "axios": "^1.7.9",
@@ -20,6 +24,6 @@
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.9.3"
+    "mongoose": "^8.24.3"
   }
 }
