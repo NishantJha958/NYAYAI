@@ -1,0 +1,57 @@
+# ── Web Framework ──────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# ── Pydantic (Settings + Validation) ───────────────────────────
+pydantic==2.8.2
+pydantic-settings==2.4.0
+python-dotenv==1.0.1
+
+# ── LangChain — Full Stack ─────────────────────────────────────
+langchain                               # Core chains, memory, agents
+langchain-core                          # Base abstractions
+langchain-community                     # Community integrations (ChromaDB loader etc.)
+langchain-openai                        # OpenAI-compatible API support
+langgraph                               # Agentic graph workflows
+langchain-google-genai                  # Gemini via LangChain
+langchain-groq                          # Groq via LangChain
+langchain-mistralai                     # Mistral via LangChain
+langchain-huggingface                   # HuggingFace embeddings via LangChain
+langchain-text-splitters                # RecursiveCharacterTextSplitter
+
+# ── Vector DB ──────────────────────────────────────────────────
+chromadb                                # Vector database
+langchain-chroma                        # LangChain ↔ ChromaDB bridge
+faiss-cpu                               # FAISS vector index (CPU, fast similarity search)
+
+# ── Embeddings ─────────────────────────────────────────────────
+sentence-transformers                   # all-MiniLM-L6-v2 (local, free, fast)
+torch                                   # CPU-only — installed separately via PyTorch index
+transformers>=4.44.2                    # HuggingFace transformers
+tokenizers>=0.21.0                      # Force cp314-compatible version (0.19.1 is broken on py3.14)
+huggingface-hub>=0.25.1                 # Model downloads
+
+# ── LLM Providers (Direct SDKs — for fallback chain) ──────────
+google-genai                            # Gemini SDK (new official package, replaces google-generativeai)
+groq                                    # Groq direct SDK
+mistralai                               # Mistral direct SDK
+
+# ── Text Processing & Chunking ─────────────────────────────────
+tiktoken                                # Token counting (for chunking)
+
+# ── PDF Parsing (for IndiaCode.nic.in PDFs) ───────────────────
+pdfplumber
+PyPDF2
+
+# ── HTTP Client ───────────────────────────────────────────────
+httpx
+requests                                # Standard HTTP requests
+
+# ── Data Handling ─────────────────────────────────────────────
+datasets                                # HuggingFace datasets (BNS Law RAG)
+kaggle                                  # Kaggle CLI/API
+
+# ── Utilities ─────────────────────────────────────────────────
+tqdm                                    # Progress bars for ingestion
+python-multipart                        # File uploads in FastAPI
+numpy                                   # Numerical ops

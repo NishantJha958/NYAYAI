@@ -1,0 +1,41 @@
+# ── Environment & Secrets ──────────────────────────────────────
+.env
+.env.*
+*.env
+
+# ── Python Virtual Environment ─────────────────────────────────
+venv/
+.venv/
+env/
+
+# ── Python Cache ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── ChromaDB Persistent Storage ────────────────────────────────
+chroma_db/
+
+# ── Raw & Processed Data (large files) ────────────────────────
+data/raw/
+data/processed/
+
+# ── Model Cache ────────────────────────────────────────────────
+.cache/
+models/
+*.bin
+*.safetensors
+
+# ── IDE ────────────────────────────────────────────────────────
+.vscode/
+.idea/
+
+# ── OS ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ───────────────────────────────────────────────────────
+*.log
+logs/
