@@ -8,16 +8,16 @@ pydantic-settings==2.4.0
 python-dotenv==1.0.1
 
 # ── LangChain — Full Stack ─────────────────────────────────────
-langchain                               # Core chains, memory, agents
-langchain-core                          # Base abstractions
-langchain-community                     # Community integrations (ChromaDB loader etc.)
-langchain-openai                        # OpenAI-compatible API support
-langgraph                               # Agentic graph workflows
-langchain-google-genai                  # Gemini via LangChain
-langchain-groq                          # Groq via LangChain
-langchain-mistralai                     # Mistral via LangChain
-langchain-huggingface                   # HuggingFace embeddings via LangChain
-langchain-text-splitters                # RecursiveCharacterTextSplitter
+langchain>=0.3.0                        # Core chains, memory, agents
+langchain-core>=0.3.0                   # Base abstractions
+langchain-community>=0.3.0              # Community integrations (ChromaDB loader etc.)
+langchain-openai>=0.2.0                 # OpenAI-compatible API support
+langgraph>=0.2.20                       # Agentic graph workflows
+langchain-google-genai>=2.0.0           # Gemini via LangChain
+langchain-groq>=0.2.0                   # Groq via LangChain
+langchain-mistralai>=0.2.0              # Mistral via LangChain
+langchain-huggingface>=0.1.0            # HuggingFace embeddings via LangChain
+langchain-text-splitters>=0.3.0         # RecursiveCharacterTextSplitter
 
 # ── Vector DB ──────────────────────────────────────────────────
 chromadb                                # Vector database
