@@ -3,33 +3,32 @@ fastapi==0.115.0
 uvicorn[standard]==0.30.6
 
 # ── Pydantic (Settings + Validation) ───────────────────────────
-pydantic==2.8.2
-pydantic-settings==2.4.0
+pydantic
+pydantic-settings
 python-dotenv==1.0.1
 
 # ── LangChain — Full Stack ─────────────────────────────────────
-langchain>=0.3.0                        # Core chains, memory, agents
-langchain-core>=0.3.0                   # Base abstractions
-langchain-community>=0.3.0              # Community integrations (ChromaDB loader etc.)
-langchain-openai>=0.2.0                 # OpenAI-compatible API support
-langgraph>=0.2.20                       # Agentic graph workflows
-langchain-google-genai>=2.0.0           # Gemini via LangChain
-langchain-groq>=0.2.0                   # Groq via LangChain
-langchain-mistralai>=0.2.0              # Mistral via LangChain
-langchain-huggingface>=0.1.0            # HuggingFace embeddings via LangChain
-langchain-text-splitters>=0.3.0         # RecursiveCharacterTextSplitter
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langgraph
+langchain-google-genai
+langchain-groq
+langchain-mistralai
+langchain-huggingface
+langchain-text-splitters
 
 # ── Vector DB ──────────────────────────────────────────────────
-chromadb                                # Vector database
-langchain-chroma                        # LangChain ↔ ChromaDB bridge
-faiss-cpu                               # FAISS vector index (CPU, fast similarity search)
+chromadb
+langchain-chroma
+faiss-cpu
 
 # ── Embeddings ─────────────────────────────────────────────────
-sentence-transformers                   # all-MiniLM-L6-v2 (local, free, fast)
-torch                                   # CPU-only — installed separately via PyTorch index
-transformers>=4.44.2                    # HuggingFace transformers
-tokenizers>=0.21.0                      # Force cp314-compatible version (0.19.1 is broken on py3.14)
-huggingface-hub>=0.25.1                 # Model downloads
+sentence-transformers
+torch
+transformers
+huggingface-hub
 
 # ── LLM Providers (Direct SDKs — for fallback chain) ──────────
 google-genai                            # Gemini SDK (new official package, replaces google-generativeai)
