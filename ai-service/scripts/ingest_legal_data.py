@@ -271,6 +271,12 @@ PIPELINE = [
         "normalise_fn"  : normalise_ipc_bns_mapping,
         "desc"          : "IPC to BNS Mapping (563 entries)",
     },
+    {
+        "jsonl"         : RAW_DIR / "indian_law_general" / "train.jsonl",
+        "collection"    : "indian_law_general",
+        "normalise_fn"  : normalise_legal_qa, # Reuse legal QA normalisation
+        "desc"          : "General Indian Law (RTI, Consumer Protection, etc)",
+    },
 ]
 
 

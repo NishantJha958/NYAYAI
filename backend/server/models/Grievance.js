@@ -59,6 +59,14 @@ const grievanceSchema = new mongoose.Schema(
       type: [statuteSchema],
       default: [],
     },
+    attachments: [
+      {
+        filename: String,
+        path: String,
+        mimetype: String,
+        size: Number,
+      }
+    ],
     status: {
       type: String,
       enum: ['pending', 'processing', 'completed', 'failed'],

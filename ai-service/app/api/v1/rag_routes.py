@@ -6,10 +6,11 @@ Protected by the Inter-Service Key.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from app.core.security import verify_inter_service_key
-from app.services.rag_service import query_legal_assistant
+from app.services.rag_service import query_legal_assistant, stream_legal_assistant
 from app.db.vector_store import search_legal_context
 
 router = APIRouter(
@@ -44,6 +45,19 @@ async def ask_legal_question(request: QueryRequest):
         return QueryResponse(
             answer=result.get("answer", ""),
             sources=result.get("sources", [])
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
+@router.post("/query/stream")
+async def ask_legal_question_stream(request: QueryRequest):
+    """
+    Accepts a legal question and streams the AI-generated answer chunk by chunk.
+    """
+    try:
+        return StreamingResponse(
+            stream_legal_assistant(request.question), 
+            media_type="text/event-stream"
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")

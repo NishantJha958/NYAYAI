@@ -2,7 +2,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const TOKEN_KEY = 'nyaya_token';
 
 export function getToken() {
-  if (localStorage.getItem(TOKEN_KEY)) {
+  // Migrate token from localStorage to sessionStorage if it exists (one-time migration)
+  const legacyToken = localStorage.getItem(TOKEN_KEY);
+  if (legacyToken) {
+    sessionStorage.setItem(TOKEN_KEY, legacyToken);
     localStorage.removeItem(TOKEN_KEY);
   }
   return sessionStorage.getItem(TOKEN_KEY);

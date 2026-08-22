@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { AppError } from '../utils/AppError.js';
-import { signToken } from '../middleware/authMiddleware.js';
+import { signAccessToken, signRefreshToken } from '../middleware/authMiddleware.js';
 import { validateRegister, validateLogin } from '../utils/validators.js';
 
 export const register = async (req, res, next) => {
@@ -27,13 +28,20 @@ export const register = async (req, res, next) => {
       preferredLang: preferredLang || 'en',
     });
 
-    const token = signToken(user._id.toString());
+    const accessToken = signAccessToken(user._id.toString());
+    const refreshToken = signRefreshToken(user._id.toString());
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
 
     res.status(201).json({
       success: true,
       data: {
         user: user.toSafeObject(),
-        token,
+        token: accessToken,
       },
     });
   } catch (err) {
@@ -60,13 +68,20 @@ export const login = async (req, res, next) => {
       throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
     }
 
-    const token = signToken(user._id.toString());
+    const accessToken = signAccessToken(user._id.toString());
+    const refreshToken = signRefreshToken(user._id.toString());
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
 
     res.json({
       success: true,
       data: {
         user: user.toSafeObject(),
-        token,
+        token: accessToken,
       },
     });
   } catch (err) {
@@ -92,7 +107,7 @@ export const getProfile = async (req, res, next) => {
 
 export const updateProfile = async (req, res, next) => {
   try {
-    const { name, preferredLang } = req.body;
+    const { name, preferredLang, state, city, age, gender, profession, incomeBracket, socialCategory } = req.body;
     const updates = {};
 
     if (name !== undefined) {
@@ -109,6 +124,14 @@ export const updateProfile = async (req, res, next) => {
       updates.preferredLang = preferredLang;
     }
 
+    if (state !== undefined) updates.state = typeof state === 'string' ? state.trim() : '';
+    if (city !== undefined) updates.city = typeof city === 'string' ? city.trim() : '';
+    if (age !== undefined && age !== '') updates.age = Number(age) || undefined;
+    if (gender !== undefined) updates.gender = gender;
+    if (profession !== undefined) updates.profession = typeof profession === 'string' ? profession.trim() : '';
+    if (incomeBracket !== undefined) updates.incomeBracket = incomeBracket;
+    if (socialCategory !== undefined) updates.socialCategory = socialCategory;
+
     const user = await User.findByIdAndUpdate(req.userId, updates, {
       new: true,
       runValidators: true,
@@ -122,6 +145,61 @@ export const updateProfile = async (req, res, next) => {
       success: true,
       data: { user: user.toSafeObject() },
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const refresh = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.cookies;
+    
+    if (!refreshToken) {
+      throw new AppError('No refresh token provided', 401, 'UNAUTHORIZED');
+    }
+
+    const secret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET;
+    
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, secret);
+    } catch (err) {
+      res.clearCookie('refreshToken');
+      throw new AppError('Invalid or expired refresh token', 401, 'UNAUTHORIZED');
+    }
+
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      res.clearCookie('refreshToken');
+      throw new AppError('User not found', 401, 'UNAUTHORIZED');
+    }
+
+    const newAccessToken = signAccessToken(user._id.toString());
+    const newRefreshToken = signRefreshToken(user._id.toString());
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+
+    res.json({
+      success: true,
+      data: { token: newAccessToken },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    res.json({ success: true, message: 'Logged out successfully' });
   } catch (err) {
     next(err);
   }

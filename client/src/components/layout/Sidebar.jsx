@@ -16,15 +16,15 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between hidden md:flex">
+    <aside className="w-64 bg-[#0a0a0a] border-r border-white/5 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between hidden md:flex">
       <div className="space-y-6">
         {/* User Card */}
-        <div className="p-3.5 bg-nyaya-light rounded-xl border border-gray-100 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-nyaya-navy text-nyaya-gold flex items-center justify-center font-bold text-base shadow-sm">
+        <div className="p-3.5 bg-[#111] rounded-xl border border-white/5 flex items-center gap-3 shadow-inner">
+          <div className="w-10 h-10 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40 flex items-center justify-center font-bold text-base shadow-[0_0_10px_rgba(20,184,166,0.2)]">
             {user?.name ? user.name[0].toUpperCase() : 'U'}
           </div>
           <div className="overflow-hidden">
-            <div className="text-sm font-bold text-nyaya-navy truncate">
+            <div className="text-sm font-bold text-gray-200 truncate">
               {user?.name || 'NYAYA Citizen'}
             </div>
             <div className="text-xs text-gray-500 truncate">{user?.email}</div>
@@ -41,8 +41,8 @@ export default function Sidebar() {
                 to={link.to}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   active
-                    ? 'bg-nyaya-navy text-white shadow-sm'
-                    : 'text-gray-600 hover:text-nyaya-navy hover:bg-gray-100/80'
+                    ? 'bg-teal-500/20 text-teal-300 border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.15)]'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
                 }`}
               >
                 <span className="text-lg">{link.icon}</span>
@@ -54,8 +54,8 @@ export default function Sidebar() {
       </div>
 
       {/* Footer info */}
-      <div className="p-3 bg-nyaya-navy/5 rounded-xl text-xs text-gray-500 space-y-1">
-        <div className="font-semibold text-nyaya-navy">NYAYA v1.0 (MVP)</div>
+      <div className="p-3 bg-white/5 rounded-xl text-xs text-gray-500 space-y-1 border border-white/5">
+        <div className="font-semibold text-teal-500/80">NYAYA v1.0 (MVP)</div>
         <div>Indian Law AI Empowerment</div>
       </div>
     </aside>

@@ -28,9 +28,21 @@ export const authMiddleware = (req, _res, next) => {
   }
 };
 
-export const signToken = (userId) => {
+export const signAccessToken = (userId) => {
   const secret = process.env.JWT_SECRET;
-  const expiresIn = process.env.JWT_EXPIRE || '7d';
+  const expiresIn = '1h'; // Access token valid for 1 hour
+
+  if (!secret) {
+    throw new AppError('JWT configuration error', 500, 'CONFIG_ERROR');
+  }
+
+  return jwt.sign({ userId }, secret, { expiresIn });
+};
+
+export const signRefreshToken = (userId) => {
+  // Use a separate secret for refresh tokens ideally, but falling back to JWT_SECRET if REFRESH_TOKEN_SECRET is not set
+  const secret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET;
+  const expiresIn = '7d'; // Long-lived refresh token
 
   if (!secret) {
     throw new AppError('JWT configuration error', 500, 'CONFIG_ERROR');

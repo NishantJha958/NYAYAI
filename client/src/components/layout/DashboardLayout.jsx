@@ -21,7 +21,7 @@ export default function DashboardLayout({ children, requireAuth = true }) {
   }
 
   return (
-    <div className="min-h-screen bg-nyaya-light flex flex-col font-sans">
+    <div className="min-h-screen bg-[#050505] text-white flex flex-col font-sans">
       <Navbar />
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
         <Sidebar />

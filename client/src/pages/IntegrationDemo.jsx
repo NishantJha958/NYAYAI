@@ -108,7 +108,7 @@ export default function IntegrationDemo() {
             <Link to="/" className="text-xl font-bold">
               NYAYA
             </Link>
-            <span className="ml-2 text-xs bg-nyaya-gold/30 px-2 py-1 rounded">
+            <span className="ml-2 text-xs bg-teal-400/30 px-2 py-1 rounded">
               Integration Demo
             </span>
           </div>
@@ -267,7 +267,7 @@ export default function IntegrationDemo() {
               {searchResults?.results?.length > 0 && (
                 <ul className="mt-4 space-y-3">
                   {searchResults.results.map((r, i) => (
-                    <li key={i} className="text-sm border-l-4 border-nyaya-gold pl-3">
+                    <li key={i} className="text-sm border-l-4 border-teal-400 pl-3">
                       <strong>
                         {r.act} §{r.section}
                       </strong>{' '}

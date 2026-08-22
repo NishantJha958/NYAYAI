@@ -16,21 +16,43 @@ export const createGrievance = async (req, res, next) => {
     const user = await User.findById(req.userId);
     const lang = language || user?.preferredLang || 'en';
 
+    const attachments = (req.files || []).map(f => ({
+      filename: f.originalname,
+      path: f.path,
+      mimetype: f.mimetype,
+      size: f.size
+    }));
+
     const grievance = await Grievance.create({
       userId: req.userId,
       plainText: plainText.trim(),
       category,
       language: lang,
       additionalDetails: additionalDetails?.trim() || '',
+      attachments,
       status: 'processing',
     });
 
     try {
+      let userContext = '';
+      if (user.state || user.city || user.age || user.profession || (user.gender && user.gender !== 'Prefer not to say') || (user.incomeBracket && user.incomeBracket !== 'Prefer not to say') || (user.socialCategory && user.socialCategory !== 'Prefer not to say')) {
+        const parts = [];
+        if (user.age) parts.push(`Age ${user.age}`);
+        if (user.gender && user.gender !== 'Prefer not to say') parts.push(`Gender ${user.gender}`);
+        if (user.socialCategory && user.socialCategory !== 'Prefer not to say') parts.push(`Category ${user.socialCategory}`);
+        if (user.incomeBracket && user.incomeBracket !== 'Prefer not to say') parts.push(`Income ${user.incomeBracket}`);
+        if (user.city || user.state) parts.push(`Location ${user.city ? user.city + ', ' : ''}${user.state || ''}`);
+        if (user.profession) parts.push(`Profession ${user.profession}`);
+        userContext = `[User Demographics: ${parts.join(', ')}]`;
+      }
+
       const aiResult = await generateDraft({
         plainText: grievance.plainText,
         category: grievance.category,
         language: grievance.language,
         additionalDetails: grievance.additionalDetails,
+        files: req.files || [],
+        userContext
       });
 
       grievance.legalDraft = aiResult.draft || aiResult.legal_draft || aiResult.legalDraft || '';

@@ -55,3 +55,4 @@ kaggle                                  # Kaggle CLI/API
 tqdm                                    # Progress bars for ingestion
 python-multipart                        # File uploads in FastAPI
 numpy                                   # Numerical ops
+faster-whisper                          # Speech to Text model

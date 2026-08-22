@@ -35,6 +35,9 @@ User's Situation / Request:
 INSTRUCTIONS:
 1. "draft": Write a professional, formal, and complete legal draft for the {document_type}. Include placeholders like [Name], [Date], [Address] where necessary. Use the legal context to cite specific sections (like BNS or IPC) if relevant.
 2. "simplified_explanation": Write a simple, easy-to-understand explanation for a normal citizen detailing exactly what this document is, what they need to fill in, and what their next steps should be (e.g., "Take this to the post office and send it via registered post").
+3. OUTPUT LANGUAGE: You MUST output the VALUES of BOTH the 'draft' and 'simplified_explanation' entirely in the requested language ({language}). If the language is 'hi', 'hindi', or 'Hindi', you MUST output the values completely in Hindi (Devanagari script).
+4. CRITICAL JSON RULE: The JSON keys MUST REMAIN EXACTLY AS 'draft' and 'simplified_explanation'. DO NOT translate the keys into Hindi. ONLY translate the VALUES into Hindi. Do NOT output any conversational text outside the JSON.
+5. DO NOT use any markdown formatting characters such as '#', '*', or '**' in the output. The output should be raw plain text.
 
 {format_instructions}
 """
@@ -48,12 +51,38 @@ prompt = ChatPromptTemplate.from_template(
 draft_chain = prompt | resilient_llm | parser
 
 
-async def generate_legal_draft(situation: str, document_type: str) -> dict:
+import PyPDF2
+import io
+from fastapi import UploadFile
+from typing import List
+
+async def generate_legal_draft(situation: str, document_type: str, language: str = "en", files: List[UploadFile] = None) -> dict:
     """
-    1. Retrieves relevant legal chunks.
-    2. Invokes the LCEL chain.
-    3. Returns a parsed JSON dictionary containing the 'draft' and 'simplified_explanation', along with sources.
+    1. Extracts text from uploaded files (if any) and appends to situation.
+    2. Retrieves relevant legal chunks.
+    3. Invokes the LCEL chain.
+    4. Returns a parsed JSON dictionary containing the 'draft' and 'simplified_explanation', along with sources.
     """
+    
+    # 0. Extract text from uploaded files
+    extracted_text = ""
+    if files:
+        for file in files:
+            content = await file.read()
+            if file.filename.lower().endswith(".pdf"):
+                try:
+                    pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
+                    for page in pdf_reader.pages:
+                        text = page.extract_text()
+                        if text:
+                            extracted_text += text + "\n"
+                except Exception as e:
+                    print(f"Error reading PDF {file.filename}: {e}")
+            elif file.filename.lower().endswith(".txt"):
+                extracted_text += content.decode("utf-8", errors="ignore") + "\n"
+            
+    if extracted_text.strip():
+        situation += f"\n\n--- Information from attached documents ---\n{extracted_text}"
     
     # 1. Retrieve Context
     # We pass the situation string as the query to find relevant laws
@@ -63,13 +92,17 @@ async def generate_legal_draft(situation: str, document_type: str) -> dict:
     )
     context_text = format_context_for_prompt(raw_results)
     
+    # Map language code to explicit name to prevent LLM confusion
+    lang_name = "Hindi (Devanagari)" if language.lower() in ["hi", "hindi"] else "English"
+    
     # 2. Generate Draft & Explanation
     # The parser ensures we get a Python dictionary back, not a raw string.
     try:
         parsed_output = await draft_chain.ainvoke({
             "context": context_text,
             "situation": situation,
-            "document_type": document_type
+            "document_type": document_type,
+            "language": lang_name
         })
     except Exception as e:
         # Fallback if parsing fails

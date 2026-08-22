@@ -5,5 +5,27 @@
 @layer base {
   body {
     @apply bg-nyaya-light text-gray-900 antialiased;
+    scroll-behavior: smooth;
+    line-height: 1.7; /* Increased line-height to prevent Hindi text clipping */
   }
+  
+  /* Ensure hindi text inside containers doesn't clip its top/bottom matras */
+  .overflow-hidden {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes movieCredits {
+  0% { transform: translateY(120px); }
+  100% { transform: translateY(-100%); }
+}
+
+.animate-credits {
+  animation: movieCredits 12s linear infinite;
 }

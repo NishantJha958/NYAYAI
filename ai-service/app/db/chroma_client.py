@@ -44,8 +44,9 @@ class Collections:
     BNS_SECTIONS    = "bns_sections"      # BNS 2023 section definitions
     LEGAL_QA        = "legal_qa"          # Q&A pairs (BNS/BNSS/BSA)
     IPC_BNS_MAPPING = "ipc_bns_mapping"  # Old IPC → New BNS cross-reference
+    INDIAN_LAW_GENERAL = "indian_law_general"
 
-    ALL = [BNS_SECTIONS, LEGAL_QA, IPC_BNS_MAPPING]
+    ALL = [BNS_SECTIONS, LEGAL_QA, IPC_BNS_MAPPING, INDIAN_LAW_GENERAL]
 
 
 def get_collection(name: str) -> chromadb.Collection:

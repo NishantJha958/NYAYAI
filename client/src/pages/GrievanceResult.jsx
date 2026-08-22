@@ -33,24 +33,24 @@ export default function GrievanceResult() {
         <div className="flex items-center justify-between">
           <Link
             to="/dashboard"
-            className="text-xs font-bold text-nyaya-navy hover:text-nyaya-blue flex items-center gap-1"
+            className="text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
           >
             ← Back to Dashboard
           </Link>
           <Link
             to="/grievance"
-            className="text-xs font-bold bg-nyaya-navy text-white px-3 py-1.5 rounded-lg hover:bg-nyaya-blue transition-colors"
+            className="text-xs font-bold bg-teal-500/20 text-teal-300 px-3 py-1.5 rounded-lg border border-teal-500/40 hover:bg-teal-500/30 transition-colors shadow-sm"
           >
             + New Grievance
           </Link>
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm text-center">
+          <div className="bg-[#111] rounded-2xl p-12 border border-white/5 shadow-sm text-center">
             <LoadingSpinner size="lg" text="Loading legal notice and analysis..." />
           </div>
         ) : error ? (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+          <div className="p-4 bg-red-900/20 border border-red-500/30 text-red-400 rounded-xl text-sm">
             {error}
           </div>
         ) : grievance ? (

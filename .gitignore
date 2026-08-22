@@ -39,3 +39,7 @@ ai-service/data/raw/
 .idea/
 .DS_Store
 *.swp
+
+# Node / Backend
+logs/
+node_modules/

@@ -5,7 +5,7 @@ Exposes the Legal Drafting service as a REST endpoint.
 Protected by the Inter-Service Key.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from app.core.security import verify_inter_service_key
@@ -16,11 +16,6 @@ router = APIRouter(
     tags=["Legal Drafting"],
     dependencies=[Depends(verify_inter_service_key)]
 )
-
-# ── Pydantic Request/Response Models ──────────────────────────────────
-class DraftRequest(BaseModel):
-    situation: str = Field(..., description="The user's situation or grievance.")
-    document_type: str = Field(..., description="The type of document to draft (e.g., 'RTI', 'PIL', 'Legal Notice').")
 
 class SourceModel(BaseModel):
     act: Optional[str]
@@ -35,13 +30,18 @@ class DraftResponse(BaseModel):
 
 # ── Endpoint ────────────────────────────────────────────────────────
 @router.post("/draft", response_model=DraftResponse)
-async def create_legal_draft(request: DraftRequest):
+async def create_legal_draft(
+    situation: str = Form(...),
+    document_type: str = Form(...),
+    language: str = Form("en"),
+    files: List[UploadFile] = File([])
+):
     """
     Accepts a situation and document type, retrieves legal context, 
     and returns a formal legal draft plus a plain-English explanation.
     """
     try:
-        result = await generate_legal_draft(request.situation, request.document_type)
+        result = await generate_legal_draft(situation, document_type, language, files)
         return DraftResponse(
             draft=result.get("draft", ""),
             simplified_explanation=result.get("simplified_explanation", ""),

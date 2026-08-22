@@ -18,19 +18,31 @@ function App() {
     <AuthProvider>
       <LanguageProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/grievance" element={<Grievance />} />
-            <Route path="/grievance/:id" element={<GrievanceResult />} />
-            <Route path="/chat" element={<Chatbot />} />
-            <Route path="/search" element={<LegalSearch />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/demo" element={<IntegrationDemo />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          {/* Global Hologram Overlay */}
+          <div 
+            className="fixed inset-0 z-[100] pointer-events-none opacity-[0.15] mix-blend-screen"
+            style={{
+              backgroundImage: "url('/lady_justice_hologram.jpg')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center 20%',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+          <div className="relative z-10">
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/grievance" element={<Grievance />} />
+              <Route path="/grievance/:id" element={<GrievanceResult />} />
+              <Route path="/chat" element={<Chatbot />} />
+              <Route path="/search" element={<LegalSearch />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/demo" element={<IntegrationDemo />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
         </BrowserRouter>
       </LanguageProvider>
     </AuthProvider>

@@ -18,16 +18,17 @@ RAG_PROMPT_TEMPLATE = """You are NYAYA, an AI legal assistant for Indian citizen
 Answer the user's question based strictly on the provided legal context. 
 If the context does not contain the answer, explicitly state: "I cannot provide a definitive answer based on the provided legal context." 
 Do NOT invent or hallucinate laws.
+Do NOT use any markdown formatting symbols like '#', '*', '**', or '@'. You MUST output raw plain text only. Do NOT use bolding or headers.
 
 For EVERY response, you MUST structure your answer exactly like this:
 
-## ⚖️ Legal Answer
+LEGAL ANSWER:
 [Provide the formal legal answer. Cite specific sections (e.g., BNS, IPC) if available in the context. Use proper legal terminology.]
 
-## 📖 Simple Explanation (सरल भाषा में)
+SIMPLE EXPLANATION (Saral Bhasha Mein):
 [Explain the exact same thing in EXTREMELY simple, everyday language that anyone can understand. Do NOT use any legal jargon here. Explain it like you are talking to a friend.]
 
-## 🔜 What To Do Next
+WHAT TO DO NEXT:
 [Give 2-3 actionable steps the person can take based on their situation, like 'Go to the police station' or 'Consult a lawyer'.]
 
 Context from Indian Law Database:
@@ -91,3 +92,21 @@ async def query_legal_assistant(question: str) -> dict:
         "answer": answer,
         "sources": unique_sources
     }
+
+async def stream_legal_assistant(question: str):
+    """
+    Executes the RAG pipeline but yields chunks of the AI's response in real-time.
+    Note: Sources are currently omitted in the stream for simplicity, but could be yielded as a final meta-chunk.
+    """
+    raw_results = search_legal_context(
+        query=question, 
+        top_k=settings.RETRIEVAL_TOP_K
+    )
+    
+    context_text = format_context_for_prompt(raw_results)
+    
+    async for chunk in rag_chain.astream({
+        "context": context_text,
+        "question": question
+    }):
+        yield chunk

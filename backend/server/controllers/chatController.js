@@ -6,6 +6,8 @@ import { validateChat } from '../utils/validators.js';
 import { sendChatMessage, streamChatMessage } from '../services/aiBridge.js';
 import axios from 'axios';
 import FormData from 'form-data';
+import cache from '../utils/cache.js';
+import { getCacheKey } from '../utils/cacheUtils.js';
 
 const buildHistoryForAi = (messages) =>
   messages.map((m) => ({
@@ -53,11 +55,35 @@ export const sendMessage = async (req, res, next) => {
       userContext = `[User Context: ${parts.join(', ')}] `;
     }
 
-    const aiResult = await sendChatMessage({
-      message: `${userContext}${message.trim()}`,
-      history: buildHistoryForAi(chat.messages.slice(0, -1)),
-      language: lang,
-    });
+    const fullMessage = `${userContext}${message.trim()}`;
+    const aiHistory = buildHistoryForAi(chat.messages.slice(0, -1));
+    const cacheKey = getCacheKey('chat', lang, fullMessage, { history: JSON.stringify(aiHistory) });
+
+    let aiResult;
+    try {
+      const cached = await cache.get(cacheKey);
+      if (cached) {
+        aiResult = JSON.parse(cached);
+      }
+    } catch (e) {
+      // ignore cache get error
+    }
+
+    if (!aiResult) {
+      aiResult = await sendChatMessage({
+        message: fullMessage,
+        history: aiHistory,
+        language: lang,
+      });
+
+      try {
+        if (aiResult && aiResult.answer) {
+          await cache.setex(cacheKey, 3600, JSON.stringify(aiResult));
+        }
+      } catch (e) {
+        // ignore cache set error
+      }
+    }
 
     // FastAPI pre-formats the entire response (Legal, Simple, Next Steps) into 'answer'
     const assistantContent = aiResult.answer || 'I am sorry, I could not generate a response.';
@@ -130,10 +156,29 @@ export const streamMessage = async (req, res, next) => {
 
     // Set a header with the sessionId so the client knows it immediately
     res.setHeader('X-Session-Id', sid);
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const fullMessage = `${userContext}${message.trim()}`;
+    const aiHistory = buildHistoryForAi(chat.messages.slice(0, -1));
+    const cacheKey = getCacheKey('chat_stream', lang, fullMessage, { history: JSON.stringify(aiHistory) });
+
+    try {
+      const cached = await cache.get(cacheKey);
+      if (cached) {
+        const aiResult = JSON.parse(cached);
+        res.write(aiResult.answer);
+        res.end();
+        return;
+      }
+    } catch (e) {
+      // ignore cache error
+    }
 
     await streamChatMessage({
-      message: `${userContext}${message.trim()}`,
-      history: buildHistoryForAi(chat.messages.slice(0, -1)),
+      message: fullMessage,
+      history: aiHistory,
       language: lang,
       res,
       onComplete: async (fullAnswer) => {
@@ -143,6 +188,12 @@ export const streamMessage = async (req, res, next) => {
           timestamp: new Date(),
         });
         await chat.save();
+        
+        try {
+          await cache.setex(cacheKey, 3600, JSON.stringify({ answer: fullAnswer }));
+        } catch (e) {
+          // ignore cache error
+        }
       }
     });
   } catch (err) {
