@@ -1,4 +1,4 @@
-import { queryLegal } from '../services/aiBridge.js';
+import { searchLegalDB } from '../services/aiBridge.js';
 import User from '../models/User.js';
 import { AppError } from '../utils/AppError.js';
 import { validateLegalQuery } from '../utils/validators.js';
@@ -14,7 +14,7 @@ export const searchLegal = async (req, res, next) => {
     const user = await User.findById(req.userId);
     const lang = language || user?.preferredLang || 'en';
 
-    const results = await queryLegal({
+    const results = await searchLegalDB({
       query: query.trim(),
       language: lang,
       filters: filters || {},

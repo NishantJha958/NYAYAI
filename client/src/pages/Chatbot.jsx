@@ -11,7 +11,10 @@ export default function Chatbot() {
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,6 +28,48 @@ export default function Chatbot() {
     setSessionId(crypto.randomUUID());
     setMessages([]);
     setError('');
+  };
+
+  const handleToggleRecording = async () => {
+    if (isRecording) {
+      mediaRecorderRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        try {
+          setLoading(true);
+          const res = await chatApi.transcribeVoice(audioBlob);
+          if (res.data?.text) {
+            setInputMessage((prev) => (prev ? prev + ' ' + res.data.text : res.data.text));
+          }
+        } catch (err) {
+          setError('Failed to transcribe voice.');
+        } finally {
+          setLoading(false);
+          stream.getTracks().forEach((track) => track.stop());
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      setError('Microphone access denied or not available.');
+    }
   };
 
   const handleSend = async (e) => {
@@ -179,15 +224,27 @@ export default function Chatbot() {
         </div>
 
         {/* Input Bar */}
-        <form onSubmit={handleSend} className="flex gap-2">
+        <form onSubmit={handleSend} className="flex gap-2 items-center">
           <input
             type="text"
-            required
+            required={!isRecording && !inputMessage.trim()}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder={t('chatPlaceholder')}
             className="flex-1 px-4 py-3 bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm shadow-sm"
           />
+          <button
+            type="button"
+            onClick={handleToggleRecording}
+            className={`p-3 rounded-xl shadow transition-colors text-lg flex items-center justify-center ${
+              isRecording 
+                ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+            }`}
+            title="Voice to Text"
+          >
+            🎤
+          </button>
           <button
             type="submit"
             disabled={loading || !inputMessage.trim()}

@@ -1,48 +1,22 @@
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { z } from 'zod';
 
-export const validateRegister = (body) => {
-  const errors = [];
-  const { name, email, password, preferredLang } = body;
+const registerSchema = z.object({
+  name: z.string().trim().min(2, 'Name must be at least 2 characters'),
+  email: z.string().trim().email('A valid email is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  preferredLang: z.enum(['en', 'hi'], {
+    errorMap: () => ({ message: 'preferredLang must be en or hi' }),
+  }).optional(),
+});
 
-  if (!name || typeof name !== 'string' || name.trim().length < 2) {
-    errors.push('Name must be at least 2 characters');
-  }
+const loginSchema = z.object({
+  email: z.string().trim().email('A valid email is required'),
+  password: z.string().min(1, 'Password is required'),
+});
 
-  if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
-    errors.push('A valid email is required');
-  }
-
-  if (!password || typeof password !== 'string' || password.length < 6) {
-    errors.push('Password must be at least 6 characters');
-  }
-
-  if (preferredLang && !['en', 'hi'].includes(preferredLang)) {
-    errors.push('preferredLang must be en or hi');
-  }
-
-  return errors;
-};
-
-export const validateLogin = (body) => {
-  const errors = [];
-  const { email, password } = body;
-
-  if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
-    errors.push('A valid email is required');
-  }
-
-  if (!password || typeof password !== 'string') {
-    errors.push('Password is required');
-  }
-
-  return errors;
-};
-
-export const validateGrievance = (body) => {
-  const errors = [];
-  const { plainText, category, language } = body;
-
-  const validCategories = [
+const grievanceSchema = z.object({
+  plainText: z.string().trim().min(10, 'Problem description must be at least 10 characters'),
+  category: z.enum([
     'Property / Rent',
     'Consumer',
     'Police / Criminal',
@@ -51,53 +25,36 @@ export const validateGrievance = (body) => {
     'Government Services',
     'Family',
     'Other',
-  ];
+  ], {
+    errorMap: () => ({ message: 'A valid category is required' }),
+  }),
+  language: z.enum(['en', 'hi'], {
+    errorMap: () => ({ message: 'language must be en or hi' }),
+  }).optional(),
+});
 
-  if (!plainText || typeof plainText !== 'string' || plainText.trim().length < 10) {
-    errors.push('Problem description must be at least 10 characters');
-  }
+const chatSchema = z.object({
+  message: z.string().trim().min(1, 'Message is required'),
+  sessionId: z.string().optional(),
+  language: z.enum(['en', 'hi'], {
+    errorMap: () => ({ message: 'language must be en or hi' }),
+  }).optional(),
+});
 
-  if (!category || !validCategories.includes(category)) {
-    errors.push('A valid category is required');
-  }
+const legalQuerySchema = z.object({
+  query: z.string().trim().min(3, 'Query must be at least 3 characters'),
+  language: z.enum(['en', 'hi'], {
+    errorMap: () => ({ message: 'language must be en or hi' }),
+  }).optional(),
+});
 
-  if (language && !['en', 'hi'].includes(language)) {
-    errors.push('language must be en or hi');
-  }
-
-  return errors;
+const formatZodErrors = (result) => {
+  if (result.success) return [];
+  return result.error.errors.map(err => err.message);
 };
 
-export const validateChat = (body) => {
-  const errors = [];
-  const { message, sessionId, language } = body;
-
-  if (!message || typeof message !== 'string' || message.trim().length < 1) {
-    errors.push('Message is required');
-  }
-
-  if (sessionId && typeof sessionId !== 'string') {
-    errors.push('sessionId must be a string');
-  }
-
-  if (language && !['en', 'hi'].includes(language)) {
-    errors.push('language must be en or hi');
-  }
-
-  return errors;
-};
-
-export const validateLegalQuery = (body) => {
-  const errors = [];
-  const { query, language } = body;
-
-  if (!query || typeof query !== 'string' || query.trim().length < 3) {
-    errors.push('Query must be at least 3 characters');
-  }
-
-  if (language && !['en', 'hi'].includes(language)) {
-    errors.push('language must be en or hi');
-  }
-
-  return errors;
-};
+export const validateRegister = (body) => formatZodErrors(registerSchema.safeParse(body));
+export const validateLogin = (body) => formatZodErrors(loginSchema.safeParse(body));
+export const validateGrievance = (body) => formatZodErrors(grievanceSchema.safeParse(body));
+export const validateChat = (body) => formatZodErrors(chatSchema.safeParse(body));
+export const validateLegalQuery = (body) => formatZodErrors(legalQuerySchema.safeParse(body));

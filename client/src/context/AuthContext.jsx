@@ -35,7 +35,12 @@ export function AuthProvider({ children }) {
     return res.data.user;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } catch (e) {
+      console.error('Logout failed:', e);
+    }
     setToken(null);
     setUser(null);
   };

@@ -10,6 +10,16 @@ export default function Profile() {
 
   const [name, setName] = useState(user?.name || '');
   const [prefLang, setPrefLang] = useState(user?.preferredLang || 'en');
+  
+  // New Demographic Fields
+  const [state, setState] = useState(user?.state || '');
+  const [city, setCity] = useState(user?.city || '');
+  const [age, setAge] = useState(user?.age || '');
+  const [gender, setGender] = useState(user?.gender || 'Prefer not to say');
+  const [profession, setProfession] = useState(user?.profession || '');
+  const [incomeBracket, setIncomeBracket] = useState(user?.incomeBracket || 'Prefer not to say');
+  const [socialCategory, setSocialCategory] = useState(user?.socialCategory || 'Prefer not to say');
+
   const [savedMessage, setSavedMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +31,17 @@ export default function Profile() {
     setLoading(true);
 
     try {
-      await authApi.updateProfile?.({ name, preferredLang: prefLang });
+      await authApi.updateProfile?.({ 
+        name, 
+        preferredLang: prefLang,
+        state,
+        city,
+        age,
+        gender,
+        profession,
+        incomeBracket,
+        socialCategory
+      });
       setLanguage(prefLang);
       setSavedMessage(t('profileSaved'));
       setTimeout(() => setSavedMessage(''), 3000);
@@ -92,6 +112,97 @@ export default function Profile() {
                 <option value="en">English</option>
                 <option value="hi">हिंदी (Hindi / Devanagari)</option>
               </select>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-gray-100">
+              <h3 className="text-sm font-bold text-nyaya-navy mb-4">Legal Context (Optional)</h3>
+              <p className="text-xs text-gray-500 mb-4">Adding this information helps NYAYA provide state-specific and demographic-specific legal advice automatically.</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">State of Residence</label>
+                  <input
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="e.g. Maharashtra"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="e.g. Mumbai"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Age</label>
+                  <input
+                    type="number"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    placeholder="e.g. 45"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Gender</label>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm bg-white"
+                  >
+                    <option value="Prefer not to say">Prefer not to say</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Annual Income</label>
+                  <select
+                    value={incomeBracket}
+                    onChange={(e) => setIncomeBracket(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm bg-white"
+                  >
+                    <option value="Prefer not to say">Prefer not to say</option>
+                    <option value="Below ₹1 Lakh (BPL / EWS)">Below ₹1 Lakh (BPL / EWS)</option>
+                    <option value="₹1 Lakh - ₹3 Lakhs">₹1 Lakh - ₹3 Lakhs</option>
+                    <option value="₹3 Lakhs - ₹8 Lakhs">₹3 Lakhs - ₹8 Lakhs</option>
+                    <option value="Above ₹8 Lakhs">Above ₹8 Lakhs</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Social Category</label>
+                  <select
+                    value={socialCategory}
+                    onChange={(e) => setSocialCategory(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm bg-white"
+                  >
+                    <option value="Prefer not to say">Prefer not to say</option>
+                    <option value="General">General</option>
+                    <option value="SC">SC</option>
+                    <option value="ST">ST</option>
+                    <option value="OBC">OBC</option>
+                    <option value="Women / Child">Women / Child</option>
+                    <option value="Person with Disability (PwD)">Person with Disability (PwD)</option>
+                  </select>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Profession</label>
+                  <input
+                    type="text"
+                    value={profession}
+                    onChange={(e) => setProfession(e.target.value)}
+                    placeholder="e.g. Farmer, IT Professional, Small Business Owner"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-gray-100">

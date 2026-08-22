@@ -29,6 +29,7 @@ export default function Grievance() {
   const [plainText, setPlainText] = useState('');
   const [additionalDetails, setAdditionalDetails] = useState('');
   const [grievanceLang, setGrievanceLang] = useState(language || 'en');
+  const [files, setFiles] = useState([]);
 
   const [grievance, setGrievance] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,12 +53,24 @@ export default function Grievance() {
     setGrievance(null);
 
     try {
-      const res = await grievanceApi.create({
-        plainText: plainText.trim(),
-        category,
-        language: grievanceLang,
-        additionalDetails: additionalDetails.trim(),
-      });
+      let payload;
+      if (files.length > 0) {
+        payload = new FormData();
+        payload.append('plainText', plainText.trim());
+        payload.append('category', category);
+        payload.append('language', grievanceLang);
+        payload.append('additionalDetails', additionalDetails.trim());
+        files.forEach(f => payload.append('files', f));
+      } else {
+        payload = {
+          plainText: plainText.trim(),
+          category,
+          language: grievanceLang,
+          additionalDetails: additionalDetails.trim(),
+        };
+      }
+
+      const res = await grievanceApi.create(payload);
       setGrievance(res.data?.grievance);
     } catch (err) {
       setError(err.message || 'Failed to analyze grievance and generate draft.');
@@ -159,6 +172,29 @@ export default function Grievance() {
                 placeholder={t('grievanceDetailsPlaceholder')}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-nyaya-navy text-sm"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Attach Documents (Optional, up to 5)
+              </label>
+              <input
+                type="file"
+                multiple
+                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                onChange={(e) => setFiles(Array.from(e.target.files).slice(0, 5))}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-nyaya-light file:text-nyaya-navy hover:file:bg-gray-200"
+              />
+              {files.length > 0 && (
+                <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                  <div className="font-bold mb-1">Selected Files:</div>
+                  <ul className="list-disc list-inside space-y-1">
+                    {files.map((f, i) => (
+                      <li key={i}>{f.name} ({(f.size / 1024).toFixed(1)} KB)</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             <button
