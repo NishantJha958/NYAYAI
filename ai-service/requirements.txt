@@ -23,16 +23,14 @@ langchain-text-splitters
 chromadb
 langchain-chroma
 faiss-cpu
-pysqlite3-binary  # Required for ChromaDB on Render/Linux images with old sqlite3
+pysqlite3-binary; sys_platform == 'linux'  # Required for ChromaDB on Render/Linux images with old sqlite3
 
-# ── Embeddings ─────────────────────────────────────────────────
-sentence-transformers
-torch
-transformers
+# ── Embeddings (Using Gemini API) ──────────────────────────────
+# Removed local PyTorch/Sentence-Transformers dependencies to stay within Render's 512MB RAM limit!
 huggingface-hub
 
 # ── LLM Providers (Direct SDKs — for fallback chain) ──────────
-google-genai                            # Gemini SDK (new official package, replaces google-generativeai)
+google-generativeai                     # Use older stable SDK because langchain-google-genai has bugs with the new google-genai SDK for embeddings
 groq                                    # Groq direct SDK
 mistralai                               # Mistral direct SDK
 

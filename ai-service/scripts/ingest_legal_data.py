@@ -208,18 +208,12 @@ def chunk_text(text: str, metadata: dict) -> list[dict]:
 # ══════════════════════════════════════════════════════════════
 
 def get_chroma_collection(collection_name: str):
-    """Get or create a ChromaDB collection with sentence-transformer embeddings."""
-    # pyrefly: ignore [missing-import]
+    """Get or create a ChromaDB collection with Gemini embeddings."""
     import chromadb
-    # chromadb >= 1.0 moved embedding functions to chromadb.utils.embedding_functions
-    # pyrefly: ignore [missing-import]
-    from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+    from app.db.chroma_client import get_embedding_function
 
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    embedding_fn = SentenceTransformerEmbeddingFunction(
-        model_name=EMBEDDING_MODEL,
-        device="cpu",
-    )
+    embedding_fn = get_embedding_function()
     collection = client.get_or_create_collection(
         name               = collection_name,
         embedding_function = embedding_fn,
@@ -336,6 +330,7 @@ def run_pipeline(entry: dict) -> dict:
 
     for i in range(0, len(all_chunks), BATCH_SIZE):
         batch = all_chunks[i : i + BATCH_SIZE]
+        
         total_stored += ingest_chunks(collection, batch, start_id=i)
 
         pct  = (i + len(batch)) / len(all_chunks) * 100

@@ -11,7 +11,7 @@ Usage:
 """
 
 import chromadb
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 from app.core.config import settings
 from functools import lru_cache
 
@@ -28,15 +28,12 @@ def get_chroma_client() -> chromadb.PersistentClient:
 
 # ── Singleton embedding function ──────────────────────────────
 @lru_cache(maxsize=1)
-def get_embedding_function() -> SentenceTransformerEmbeddingFunction:
+def get_embedding_function() -> DefaultEmbeddingFunction:
     """
-    Returns a cached SentenceTransformer embedding function.
-    Model is downloaded once (~90MB) and cached locally.
+    Returns Chroma's default ultra-lightweight ONNX embedding function.
+    This takes <100MB of RAM (perfect for Render) and runs locally (NO API limits)!
     """
-    return SentenceTransformerEmbeddingFunction(
-        model_name=settings.EMBEDDING_MODEL,
-        device="cpu",
-    )
+    return DefaultEmbeddingFunction()
 
 
 # ── Collection names (single source of truth) ─────────────────
