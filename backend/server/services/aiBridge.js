@@ -3,7 +3,7 @@ import axios from 'axios';
 import { AppError } from '../utils/AppError.js';
 
 const getAiConfig = () => ({
-  baseURL: process.env.FASTAPI_URL || 'http://127.0.0.1:8000',
+  baseURL: (process.env.FASTAPI_URL || 'http://127.0.0.1:8000').replace(/\/+$/, ''),
   interServiceKey: process.env.INTER_SERVICE_KEY || '',
   timeout: 60000,
 });
