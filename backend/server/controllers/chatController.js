@@ -260,7 +260,7 @@ export const processVoice = async (req, res, next) => {
       contentType: req.file.mimetype,
     });
 
-    const aiUrl = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+    const aiUrl = (process.env.FASTAPI_URL || process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
     const response = await axios.post(`${aiUrl}/speech/transcribe`, formData, {
       headers: { ...formData.getHeaders() },
     });
