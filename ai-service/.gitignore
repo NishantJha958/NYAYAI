@@ -9,14 +9,14 @@ venv/
 env/
 
 # ── Python Cache ───────────────────────────────────────────────
-__pycache__/
+__pycache__
 *.py[cod]
 *.pyo
 *.pyd
 .Python
 
 # ── ChromaDB Persistent Storage ────────────────────────────────
-chroma_db/
+#chroma_db/
 
 # ── Raw & Processed Data (large files) ────────────────────────
 data/raw/

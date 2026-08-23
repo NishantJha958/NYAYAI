@@ -23,6 +23,7 @@ langchain-text-splitters
 chromadb
 langchain-chroma
 faiss-cpu
+pysqlite3-binary  # Required for ChromaDB on Render/Linux images with old sqlite3
 
 # ── Embeddings ─────────────────────────────────────────────────
 sentence-transformers

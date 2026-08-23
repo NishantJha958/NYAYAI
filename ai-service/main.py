@@ -7,6 +7,16 @@ Entry point for the NYAYA AI FastAPI microservice.
 import sys
 import os
 
+# --- SQLite3 Patch for ChromaDB on Cloud (Render, Railway, etc.) ---
+# ChromaDB requires sqlite3 >= 3.35.0, which many Linux images don't have.
+try:
+    __import__('pysqlite3')
+    import sys
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+except ImportError:
+    pass
+# -------------------------------------------------------------------
+
 # Fix Windows console encoding for Unicode (emoji, Hindi, etc.)
 if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
